@@ -29,27 +29,12 @@ REM Переходим в папку с проектом
 CD %projectName%
 
 ECHO Создаем .gitignore
-(
-ECHO node_modules
-ECHO wp-content/cache
-) > .gitignore
+powershell -Command "Invoke-WebRequest https://github.com/BlackDefender/toolbox/raw/master/.gitignore -OutFile .gitignore"
+CALL :CONVERT_LINE_ENDINGS_TO_WINDOWS_STYLE .gitignore
 
 ECHO Создаем robots.txt
-(
-ECHO # Запрет на индексирование
-ECHO User-agent: *
-ECHO Disallow: /
-ECHO.
-ECHO.
-ECHO # Конфигурация на продакшн
-ECHO #User-agent: *
-ECHO #Disallow: /wp-admin
-ECHO #Disallow: /wp-includes
-ECHO.
-ECHO #Host: EXAMPLE.COM
-ECHO #Sitemap: https://EXAMPLE.COM/sitemap.xml
-) > robots.txt
-
+powershell -Command "Invoke-WebRequest https://github.com/BlackDefender/toolbox/raw/master/robots.txt -OutFile robots.txt"
+CALL :CONVERT_LINE_ENDINGS_TO_WINDOWS_STYLE robots.txt
 
 REM Удаляем стандартные темы
 ECHO Удаляем стандартные темы
@@ -126,4 +111,8 @@ EXIT /B
 
 :UNZIP
 powershell -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('%1.zip', '"%cd%"')"
+EXIT /B
+
+:CONVERT_LINE_ENDINGS_TO_WINDOWS_STYLE
+powershell -Command "(Get-Content -Path '%1' -ReadCount 0) -replace '\r', '\n\r' | Set-Content -Path '%1'"
 EXIT /B
