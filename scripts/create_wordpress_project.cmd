@@ -14,7 +14,7 @@ SET /p multiLanguageSupport="Включить поддержку многояз�
 
 ECHO Скачиваем и распаковываем WordPress
 REM Скачиваем WordPress
-powershell -Command "Invoke-WebRequest https://wordpress.org/latest.zip -OutFile wordpress.zip"
+powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest https://wordpress.org/latest.zip -OutFile wordpress.zip"
 
 REM Распаковываем WordPress
 CALL :UNZIP wordpress
@@ -29,11 +29,11 @@ REM Переходим в папку с проектом
 CD %projectName%
 
 ECHO Создаем .gitignore
-powershell -Command "Invoke-WebRequest https://github.com/BlackDefender/toolbox/raw/master/.gitignore -OutFile .gitignore"
+powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest https://github.com/BlackDefender/toolbox/raw/master/.gitignore -OutFile .gitignore"
 CALL :CONVERT_LINE_ENDINGS_TO_WINDOWS_STYLE .gitignore
 
 ECHO Создаем robots.txt
-powershell -Command "Invoke-WebRequest https://github.com/BlackDefender/toolbox/raw/master/robots.txt -OutFile robots.txt"
+powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest https://github.com/BlackDefender/toolbox/raw/master/robots.txt -OutFile robots.txt"
 CALL :CONVERT_LINE_ENDINGS_TO_WINDOWS_STYLE robots.txt
 
 REM Удаляем стандартные темы
@@ -45,7 +45,7 @@ CD wp-content\themes
 
 ECHO Устанавливаем пустую тему
 REM Скачиваем заготовку пустой темы
-powershell -Command "Invoke-WebRequest https://github.com/BlackDefender/empty_wordperss_template/archive/master.zip -OutFile empty_wordperss_template.zip"
+powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest https://github.com/BlackDefender/empty_wordperss_template/archive/master.zip -OutFile empty_wordperss_template.zip"
 
 REM Распаковываем ее
 CALL :UNZIP empty_wordperss_template
@@ -86,7 +86,7 @@ IF /I "%multiLanguageSupport%" == "y" (
 	DEL polylang.zip
     
     ECHO polylang-slug
-    powershell -Command "Invoke-WebRequest https://github.com/grappler/polylang-slug/archive/master.zip -OutFile polylang-slug.zip"
+    powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12;  Invoke-WebRequest https://github.com/grappler/polylang-slug/archive/master.zip -OutFile polylang-slug.zip"
     CALL :UNZIP polylang-slug
     RENAME polylang-slug-master polylang-slug
     DEL polylang-slug.zip
@@ -105,7 +105,7 @@ EXIT /B 0
 
 
 :DOWNLOAD_PLUGIN
-powershell -Command "Invoke-WebRequest https://downloads.wordpress.org/plugin/%1.latest-stable.zip -OutFile %1.zip"
+powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest https://downloads.wordpress.org/plugin/%1.latest-stable.zip -OutFile %1.zip"
 EXIT /B
 
 
