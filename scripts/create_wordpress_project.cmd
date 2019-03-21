@@ -29,12 +29,41 @@ REM Переходим в папку с проектом
 CD %projectName%
 
 ECHO Создаем .gitignore
-powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest https://github.com/BlackDefender/toolbox/raw/master/.gitignore -OutFile .gitignore"
-CALL :CONVERT_LINE_ENDINGS_TO_WINDOWS_STYLE .gitignore
+powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest https://raw.githubusercontent.com/BlackDefender/toolbox/master/.gitignore -OutFile .gitignore"
 
 ECHO Создаем robots.txt
-powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest https://github.com/BlackDefender/toolbox/raw/master/robots.txt -OutFile robots.txt"
-CALL :CONVERT_LINE_ENDINGS_TO_WINDOWS_STYLE robots.txt
+powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest https://raw.githubusercontent.com/BlackDefender/toolbox/master/robots.txt -OutFile robots.txt"
+
+
+ECHO Ставим плагины:
+REM Идем в плагины
+CD wp-content\plugins
+REM Удалим плагин Hello Dolly.
+DEL hello.php
+
+FOR %%P IN (disable-emojis,wordpress-seo,cyrlitera,kama-thumbnail,w3-total-cache,svg-support,better-wp-security,classic-editor) DO (
+	ECHO %%P
+	CALL :DOWNLOAD_PLUGIN %%P
+	CALL :UNZIP %%P
+	DEL %%P.zip
+)
+
+REM Если нужна поддержка многязычности ставми Polylang
+IF /I "%multiLanguageSupport%" == "y" (
+    ECHO polylang
+    CALL :DOWNLOAD_PLUGIN polylang
+    CALL :UNZIP polylang
+	DEL polylang.zip
+    
+    ECHO polylang-slug
+    powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12;  Invoke-WebRequest https://github.com/grappler/polylang-slug/archive/master.zip -OutFile polylang-slug.zip"
+    CALL :UNZIP polylang-slug
+    RENAME polylang-slug-master polylang-slug
+    DEL polylang-slug.zip
+)
+
+REM Возвращаемся в папку с проектом
+cd ..\..\
 
 REM Удаляем стандартные темы
 ECHO Удаляем стандартные темы
@@ -64,35 +93,12 @@ powershell -Command "(Get-Content -Path 'manifest.json' -ReadCount 0) -replace '
 REM Запишем название темы в комменты файла стилей. Это название будет отображаться в админке
 powershell -Command "(Get-Content -Path 'style.css' -ReadCount 0) -replace 'THEME_NAME', '"%themeName%"' | Set-Content -Path 'style.css'"
 
+REM Добавляем Lazysizes
+powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest https://raw.githubusercontent.com/aFarkas/lazysizes/gh-pages/lazysizes.min.js -OutFile js\min\lazysizes.min.js"
 
-ECHO Ствим плагины:
-REM Идем в плагины
-CD ..\..\plugins
-REM Удалим плагин Hello Dolly.
-DEL hello.php
+ECHO Устанавливаем Gulp
 
-FOR %%P IN (disable-emojis,wordpress-seo,cyrlitera,kama-thumbnail,w3-total-cache,svg-support,better-wp-security) DO (
-	ECHO %%P
-	CALL :DOWNLOAD_PLUGIN %%P
-	CALL :UNZIP %%P
-	DEL %%P.zip
-)
-
-REM Если нужна поддержка многязычности ставми Polylang
-IF /I "%multiLanguageSupport%" == "y" (
-    ECHO polylang
-    CALL :DOWNLOAD_PLUGIN polylang
-    CALL :UNZIP polylang
-	DEL polylang.zip
-    
-    ECHO polylang-slug
-    powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12;  Invoke-WebRequest https://github.com/grappler/polylang-slug/archive/master.zip -OutFile polylang-slug.zip"
-    CALL :UNZIP polylang-slug
-    RENAME polylang-slug-master polylang-slug
-    DEL polylang-slug.zip
-)
-
-
+CALL npm install
 
 REM Сигнализируем о завершении
 ECHO.
@@ -111,8 +117,4 @@ EXIT /B
 
 :UNZIP
 powershell -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('%1.zip', '"%cd%"')"
-EXIT /B
-
-:CONVERT_LINE_ENDINGS_TO_WINDOWS_STYLE
-powershell -Command "(Get-Content -Path '%1' -ReadCount 0) -replace '\r', '\n\r' | Set-Content -Path '%1'"
 EXIT /B
