@@ -1,7 +1,4 @@
-# Вставить этот код после директив 
-# RewriteEngine on
-# и
-# RewriteBase
+RewriteEngine on
 
 RewriteCond %{REQUEST_URI} [A-Z] [OR]
 RewriteCond %{REQUEST_URI}  \/\/+
