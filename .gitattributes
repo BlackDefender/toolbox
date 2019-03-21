@@ -1,0 +1,4 @@
+*.cmd text eol=crlf
+*.txt text eol=crlf
+*.php text eol=crlf
+.thaccess text eol=crlf
