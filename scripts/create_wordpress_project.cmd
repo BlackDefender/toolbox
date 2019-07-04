@@ -41,7 +41,7 @@ CD wp-content\plugins
 REM Удалим плагин Hello Dolly.
 DEL hello.php
 
-FOR %%P IN (disable-emojis,wordpress-seo,cyrlitera,kama-thumbnail,w3-total-cache,svg-support,better-wp-security,classic-editor) DO (
+FOR %%P IN (disable-emojis,wordpress-seo,cyrlitera,kama-thumbnail,w3-total-cache,safe-svg,better-wp-security,classic-editor) DO (
 	ECHO %%P
 	CALL :DOWNLOAD_PLUGIN %%P
 	CALL :UNZIP %%P
